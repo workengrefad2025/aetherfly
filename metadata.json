@@ -1,0 +1,6 @@
+{
+  "name": "AetherFly",
+  "description": "AetherFly delivers a cinematic luxury flight booking experience with realistic flight search, interactive seating maps, mock secure payments, dynamic e-tickets, and a personalized travel dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
