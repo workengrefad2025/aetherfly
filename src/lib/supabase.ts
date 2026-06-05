@@ -101,10 +101,6 @@ export const formatBookingPayload = (booking: Booking, userId: string) => ({
 
 export const AetherPlatformAPI = {
   async dispatchTicketEmail(booking: Booking, customerEmail: string) {
-    const ticketUrl = `https://aetherfly.com/e-ticket/${booking.ref}`;
-    const confirmation = EmailTemplates.bookingConfirmation(booking);
-    const ticket = EmailTemplates.ticketDelivery(booking, ticketUrl);
-
     const result = await EmailService.dispatchBookingEmail(booking, customerEmail);
     return {
       delivered: true,
