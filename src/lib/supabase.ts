@@ -1,6 +1,6 @@
 /// <reference types="vite/client" />
 import { createClient, SupabaseClient, Session, User } from '@supabase/supabase-js';
-import EmailService, { EmailTemplates } from '../services/emailService';
+import EmailService from '../services/emailService';
 import { Booking, Destination, LoyaltyReward, Offer, PaymentRecord, TicketRecord, UserProfile } from '../types';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? '';
@@ -105,30 +105,11 @@ export const AetherPlatformAPI = {
     const confirmation = EmailTemplates.bookingConfirmation(booking);
     const ticket = EmailTemplates.ticketDelivery(booking, ticketUrl);
 
-    const deliveries = [
-      EmailService.prepareAndQueueEmail({
-        to: customerEmail,
-        subject: confirmation.subject,
-        html: confirmation.html,
-        meta: { type: 'booking_confirmation', bookingRef: booking.ref }
-      }),
-      EmailService.prepareAndQueueEmail({
-        to: customerEmail,
-        subject: ticket.subject,
-        html: ticket.html,
-        meta: { type: 'ticket_delivery', bookingRef: booking.ref }
-      })
-    ];
-
-    if (!isSupabaseConfigured()) {
-      console.warn('Supabase not configured. Using local email queue simulation for ticket delivery.');
-    }
-
-    const results = await Promise.all(deliveries);
+    const result = await EmailService.dispatchBookingEmail(booking, customerEmail);
     return {
       delivered: true,
-      message: `Queued booking confirmation and e-ticket for ${customerEmail}`,
-      results
+      message: `Sent booking confirmation and e-ticket to ${customerEmail}`,
+      result
     };
   }
 };
