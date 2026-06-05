@@ -6,7 +6,7 @@ export interface ResendEmailOptions {
 }
 
 const RESEND_ENDPOINT = 'https://api.resend.com/emails';
-const DEFAULT_FROM = 'AetherFly Concierge <concierge@aetherfly.com>';
+const DEFAULT_RESEND_FROM = 'onboarding@resend.dev';
 const RETRYABLE_STATUSES = new Set([429, 500, 502, 503, 504]);
 
 const getApiKey = () => {
@@ -15,6 +15,16 @@ const getApiKey = () => {
     throw new Error('RESEND_API_KEY is not configured. Set the environment variable and redeploy.');
   }
   return apiKey;
+};
+
+const getFromAddress = () => {
+  const customSender = process.env.RESEND_FROM?.trim();
+  if (customSender) {
+    return customSender;
+  }
+
+  console.warn('[ResendService] RESEND_FROM is not configured. Falling back to the default Resend sender:', DEFAULT_RESEND_FROM);
+  return DEFAULT_RESEND_FROM;
 };
 
 const parseResponse = async (response: Response) => {
@@ -34,7 +44,7 @@ export const sendEmail = async (options: ResendEmailOptions) => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      from: options.from ?? DEFAULT_FROM,
+      from: options.from ?? getFromAddress(),
       to: options.to,
       subject: options.subject,
       html: options.html
